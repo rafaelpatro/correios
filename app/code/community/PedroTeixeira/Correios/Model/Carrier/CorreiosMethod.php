@@ -186,7 +186,7 @@ class PedroTeixeira_Correios_Model_Carrier_CorreiosMethod
 
             foreach ($correiosReturn as $servicos) {
 
-                $errorId = (string) $servicos->Erro;
+                $errorId = empty($servicos->Erro) ? 0 : (string) $servicos->Erro;
                 $errorList[$errorId] = $servicos->MsgErro;
 
                 if ($errorId != '0' && !in_array($errorId, $softErrors)) {
@@ -288,6 +288,7 @@ class PedroTeixeira_Correios_Model_Carrier_CorreiosMethod
             $client->setParameterGet('nVlComprimento', $this->_midSize);
             $client->setParameterGet('nVlAltura', $this->_midSize);
             $client->setParameterGet('nVlLargura', $this->_midSize);
+            $client->setParameterGet('nVlDiametro', 0);
 
             if ($this->getConfigData('mao_propria')) {
                 $client->setParameterGet('sCdMaoPropria', 'S');
@@ -340,11 +341,11 @@ class PedroTeixeira_Correios_Model_Carrier_CorreiosMethod
 
             $xml = new SimpleXMLElement($content);
 
-            if (count($xml->cServico) <= 0) {
+            if (count($xml->Servicos->cServico) <= 0) {
                 throw new Exception('No tag cServico in Correios XML [' . __LINE__ . ']');
             }
 
-            return $xml->cServico;
+            return $xml->Servicos->cServico;
         } catch (Exception $e) {
             $this->_throwError('urlerror', 'URL Error - ' . $e->getMessage(), __LINE__);
             return false;
